@@ -141,6 +141,8 @@
     <script>
          const PLAYER_API_BASE = "https://player-service-agdmhzctdvhtapfy.canadacentral-01.azurewebsites.net";
 
+         const PERFORMANCE_API_BASE = "https://performance-service-hdf6dfeccee9c0b3.canadacentral-01.azurewebsites.net";
+
         
         document.getElementById("create-team-form").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -264,12 +266,27 @@
             showPlayerResult(`Network error:\n${err}`);
         }
     });
-        // Simulate competition
-        document.getElementById("simulate-competition").addEventListener("click", async () => {
-            const response = await fetch(`${apiBaseUrl}/competitions/simulate`, { method: "POST" });
-            const result = await response.json();
-            document.getElementById("competition-results").innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+
+document.getElementById("simulate-competition").addEventListener("click", async () => {
+    const playerId = prompt("Enter Player ID to simulate performance for:");
+    if (!playerId) return;
+
+    try {
+        const response = await fetch(`${PERFORMANCE_API_BASE}/api/performance/simulate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ playerId: Number(playerId) })
         });
+
+        const text = await response.text();
+        document.getElementById("competition-results").innerHTML =
+            `<pre>${text}</pre>`;
+    } catch (err) {
+        document.getElementById("competition-results").innerHTML =
+            `<pre>Network error:\n${err}</pre>`;
+    }
+});
+
 
         // View leaderboard
         document.getElementById("view-leaderboard").addEventListener("click", async () => {
